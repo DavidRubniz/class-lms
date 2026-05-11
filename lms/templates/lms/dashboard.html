@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>מערכת למידה - דשבורד</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand">מערכת למידה</span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-light me-3">שלום, {{ request.user.username }}!</span>
+
+                {% if user.is_staff %}
+                    <a href="/admin/" class="btn btn-outline-info btn-sm">ממשק ניהול ⚙️</a>
+                {% endif %}
+
+                <form action="{% url 'logout' %}" method="post" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">התנתק</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">הציונים שלי 🎓</h4>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        {% for grade in grades %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ grade.course.name }}</strong><br>
+                                    <small class="text-muted">{{ grade.exam_name }}</small>
+                                </div>
+                                <span class="badge bg-success rounded-pill fs-6">{{ grade.score }}</span>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-center text-muted">אין לך עדיין ציונים במערכת.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <h3 class="mb-3">חומרי לימוד וסילבוסים 📚</h3>
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    {% for course in courses %}
+                        <div class="col">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">{{ course.name }}</h5>
+                                    <p class="card-text text-muted">{{ course.description }}</p>
+                                    <hr>
+                                    <ul class="list-unstyled mb-0">
+                                        {% for resource in course.resource_set.all %}
+                                            <li class="mb-2 d-flex flex-column gap-2">
+                                                <strong>{{ resource.title }}</strong>
+                                                <div class="d-flex gap-2">
+                                                    {% if resource.file %}
+                                                        <a href="{{ resource.file.url }}" target="_blank" class="btn btn-sm btn-outline-success">📄 הורד קובץ</a>
+                                                    {% endif %}
+
+                                                    {% if resource.link %}
+                                                        <a href="{{ resource.link }}" target="_blank" class="btn btn-sm btn-outline-primary">🔗 כנס לקישור</a>
+                                                    {% endif %}
+                                                </div>
+                                            </li>
+                                        {% empty %}
+                                            <li class="text-muted small">אין עדיין חומרים למקצוע זה.</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
